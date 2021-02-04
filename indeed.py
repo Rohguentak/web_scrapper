@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 
 JOB_NUM_LIMIT = 50
 INDEED_URL=f"https://kr.indeed.com/%EC%B7%A8%EC%97%85?q=python&limit={JOB_NUM_LIMIT}"
-
+INDEED_MAIN_URL = "https://kr.indeed.com"
 def extract_indeed_pages():
   i = 1
   temp=1
@@ -29,26 +29,29 @@ def extract_indeed_pages():
   #max_page = pages[-1]
   #return max_page
 
+def extract_job(html):
+    job_title = html.find("h2",{"class":"title"})
+    title = job_title.find("a")["title"]
+    link = job_title.find("a")["href"]
+    company = html.find("span",{"class":"company"})
+    company_anchor = company.find("a")
+    location = html.find("div",{"class":"recJobLoc"})["data-rc-loc"]
+    if company_anchor is not None:
+      company = str(company_anchor.string) 
+    else:
+      company = str(company.string)
+    company = company.strip()
+    return {'TITLE': title,'COMPANY': company,'LOCATION': location,'Link':f"{INDEED_MAIN_URL}{link}"}
 
 def extract_indeed_jobs(last_page):
   jobs = []
   for page in range(last_page):
+    print(f"Scrapping {page} page ")
     result = requests.get(f"{INDEED_URL}&start={page*JOB_NUM_LIMIT}")
     soup = BeautifulSoup(result.text, 'html.parser')
     job_div = soup.find_all("div",{"class": "jobsearch-SerpJobCard"})
- 
-    for d in job_div:
-      title = d.find("h2",{"class":"title"}).find("a")["title"]
-      company = d.find("span",{"class":"company"})
-      company_anchor = company.find("a")
-      if company_anchor is not None:
-        company = str(company_anchor.string) 
-      else:
-        company = str(company.string)
-      company = company.strip()
-      print("job title : " + title)
-      print("company : " + company)
-      print("===============================")
-    print(result.status_code)
+    for html in job_div:
+      job_info = extract_job(html)
+      jobs.append(job_info)
   return jobs
     
