@@ -1,8 +1,12 @@
 import requests
 from bs4 import BeautifulSoup
-from indeed import extract_indeed_pages,extract_indeed_jobs
+from indeed import get_jobs as get_indeed_jobs
+from stackoverflow import get_jobs as get_SO_jobs
 
-last_indeed_pages=extract_indeed_pages()
-print(last_indeed_pages)
-indeed_jobs = extract_indeed_jobs(last_indeed_pages)
-print(indeed_jobs)
+
+indeed_jobs = get_indeed_jobs()
+SO_jobs = get_SO_jobs()
+
+jobs = indeed_jobs + SO_jobs
+
+print(jobs)
