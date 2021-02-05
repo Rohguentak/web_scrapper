@@ -9,5 +9,4 @@ SO_jobs = get_SO_jobs()
 
 jobs = indeed_jobs + SO_jobs
 
-print(jobs)
 save_to_file(jobs)
